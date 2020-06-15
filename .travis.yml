@@ -1,0 +1,21 @@
+
+language: cpp
+compiler: gcc
+os: linux
+dist: bionic
+
+before_install:
+  - pip install --user cpp-coveralls
+
+script:
+  - mkdir -p ~/build/izuzanak/cclib/build
+  - cd ~/build/izuzanak/cclib/build
+  - cmake -DCMAKE_BUILD_TYPE="Debug" ..
+  - make
+
+  - mkdir -p /dev/shm/{run,log}
+  - make test
+
+after_success:
+  - coveralls --gcov-options '\-lp'
+
