@@ -15,6 +15,8 @@ add_test("libbase_ccl_test_test" libbase_ccl_test list basic_type_array)
 
 # - update compilation flags -
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wfatal-errors -Wno-class-memaccess")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH ON)
@@ -25,7 +27,6 @@ if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR ("${CMAKE_SYSTEM_NAME}" STREQUAL
   set(OS_LINUX TRUE)
   set(OS_WINDOWS FALSE)
   add_definitions("-DLINUX")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fprofile-arcs -ftest-coverage")
 else()
   set(OS_LINUX FALSE)
   set(OS_WINDOWS TRUE)

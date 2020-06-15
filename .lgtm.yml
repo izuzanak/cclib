@@ -1,0 +1,11 @@
+
+extraction:
+  cpp:
+    index:
+      build_command:
+        - cd $LGTM_SRC
+        - mkdir -p build
+        - cd build
+        - cmake ..
+        - make
+
