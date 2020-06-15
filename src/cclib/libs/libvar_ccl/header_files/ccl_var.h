@@ -285,7 +285,7 @@ public:
   }/*}}}*/
   [[nodiscard]] auto next_idx(uint32_t a_idx) const -> uint32_t override
   {/*{{{*/
-    if (a_idx < 0 || a_idx >= m_value.used())
+    if (a_idx >= m_value.used())
     {
       throw_error(VAR_INVALID_INDEX);
     }
@@ -294,7 +294,7 @@ public:
   }/*}}}*/
   auto at_idx(uint32_t a_idx) -> var_s & override
   {/*{{{*/
-    if (a_idx < 0 || a_idx >= m_value.used())
+    if (a_idx >= m_value.used())
     {
       throw_error(VAR_INVALID_INDEX);
     }
@@ -630,7 +630,7 @@ inline auto loc_dict_s::get(int64_t a_idx) -> var_s *
 
 inline auto loc_dict_s::next_idx(uint32_t a_idx) const -> uint32_t
 {/*{{{*/
-  if (a_idx < 0 || a_idx >= m_value.used() || !m_value.data()[a_idx].is_valid())
+  if (a_idx >= m_value.used() || !m_value.data()[a_idx].is_valid())
   {
     throw_error(VAR_INVALID_INDEX);
   }
@@ -640,7 +640,7 @@ inline auto loc_dict_s::next_idx(uint32_t a_idx) const -> uint32_t
 
 inline auto loc_dict_s::at_idx(uint32_t a_idx) -> var_s &
 {/*{{{*/
-  if (a_idx < 0 || a_idx >= m_value.used() || !m_value.data()[a_idx].is_valid())
+  if (a_idx >= m_value.used() || !m_value.data()[a_idx].is_valid())
   {
     throw_error(VAR_INVALID_INDEX);
   }

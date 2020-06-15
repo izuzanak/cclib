@@ -1105,7 +1105,7 @@ auto validator_s::validate_pair(const var_s &a_value,const var_s &a_props) noexc
       }/*}}}*/
       break;
 
-      // FIXME TODO continue ... validate other properties
+      // TODO continue ... validate other properties
 
       // - ERROR -
       default:

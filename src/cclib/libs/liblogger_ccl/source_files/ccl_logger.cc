@@ -88,7 +88,7 @@ auto logger_s::write_ap(unsigned a_level,const char *a_format,va_list a_ap) -> l
 
   m_buffer.reset()
     .string(time)
-    .append_format(".%3.3u %lld %s: ",time.milli() % 1000ULL,a_level,m_user.data())
+    .append_format(".%3.3llu %u %s: ",time.milli() % 1000ULL,a_level,m_user.data())
     .append_format(a_format,a_ap)
     .push('\n');
 

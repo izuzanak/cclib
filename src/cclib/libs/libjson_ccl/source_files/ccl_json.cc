@@ -241,7 +241,7 @@ auto json_parser_s::process_json_string(const char *a_ptr,const char *a_ptr_end,
           unsigned value = 0;
 
           // - retrieve character value -
-          const char *a_ptr_end = a_ptr + 4;
+          const char *ptr_end = a_ptr + 4;
           do {
             value <<= 4;
 
@@ -262,7 +262,7 @@ auto json_parser_s::process_json_string(const char *a_ptr,const char *a_ptr_end,
               debug_assert(false);
             }
 
-          } while(++a_ptr < a_ptr_end);
+          } while(++a_ptr < ptr_end);
 
           // - convert utf16/32 value to utf8 character string -
           if (value <= 0x7f)
@@ -326,7 +326,7 @@ auto json_parser_s::process_json_string(const char *a_ptr,const char *a_ptr_end,
   }
 }/*}}}*/
 
-auto json_parser_s::recognize_terminal() noexcept -> uint32_t
+auto json_parser_s::recognize_terminal() noexcept -> uint32_t // lgtm [cpp/use-of-goto]
 {/*{{{*/
 #define JSON_GET_NEXT_CHAR() \
   {\
