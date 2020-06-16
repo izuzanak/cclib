@@ -1105,8 +1105,6 @@ auto validator_s::validate_pair(const var_s &a_value,const var_s &a_props) noexc
       }/*}}}*/
       break;
 
-      // TODO continue ... validate other properties
-
       // - ERROR -
       default:
         VALIDATE_STACKS_PUSH_PROP_KEY();
