@@ -52,6 +52,10 @@ auto tcp_comm_s::conn_event(uint32_t a_conn_idx,uint32_t a_event) -> void
     m_client.timer_set({{0,50000000ULL},{0,1}},0);
     break;
   case c_tcp_EVENT_DROPPED:
+    
+    // - terminate if client connection was dropped -
+    m_terminate = true;
+
     m_client.timer_set({{0,0},{0,0}},0);
     break;
   }

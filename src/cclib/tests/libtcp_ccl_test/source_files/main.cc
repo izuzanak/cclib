@@ -19,8 +19,17 @@ std::array<ccl::test_function_t,test_cnt> test_functions =
 
 void test_tcp()
 {/*{{{*/
+  auto server_pid = ccl::pid_s({"./libtcp_ccl_test_tcp_server"});
+  usleep(100000);
 
-  // FIXME TODO continue ...
+  auto client_pid = ccl::pid_s({"./libtcp_ccl_test_tcp_client"});
+  usleep(1000000);
+
+  cassert(kill(server_pid,SIGTERM) == 0);
+
+  int status;
+  cassert(waitpid(client_pid,&status,0) != -1 && status == 0);
+  cassert(waitpid(server_pid,&status,0) != -1 && status == 0);
 }/*}}}*/
 
 // === program entry function ==================================================
