@@ -270,7 +270,7 @@ void test_var_dict()
   // - var operator[] -
   uint32_t idx = 0;
   do {
-    dict_0[ccl::var_s(string_format("idx(%lld)",idx))] = ccl::var_s(idx);
+    dict_0[ccl::var_s(string_format("idx(%u)",idx))] = ccl::var_s(idx);
   } while(++idx < 5);
 
   cassert(dict_0[ccl::var_s("idx(2)")].to_int() == 2);
@@ -310,7 +310,7 @@ void test_var_dict()
 
   idx = 0;
   do {
-    ccl::var_s key(string_format("idx(%lld)",idx));
+    ccl::var_s key(string_format("idx(%u)",idx));
 
     dict_3[key] = ccl::var_s(static_cast<int64_t>(dict_1.has_key(key)));
     dict_1.remove_if_key(key);

@@ -28,7 +28,7 @@ tcp_comm_s::tcp_comm_s(std::string a_ip,uint16_t a_port) :
   m_client.timer().fd_update(EPOLLIN | EPOLLPRI,true,
       [this](const epoll_event &a_epoll_event) -> void { timer_event(a_epoll_event); });
 
-  //m_client.init_ssl();
+  //m_client.conn().init_ssl();
 }/*}}}*/
 
 auto tcp_comm_s::run() -> tcp_comm_s &
