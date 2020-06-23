@@ -3,7 +3,7 @@
 #define LIBS_LIBTCP_CCL_HEADER_FILES_CCL_TCP_H
 
 #include "ccl_linux.h"
-#include "ccl_openssl.h"
+//#include "ccl_openssl.h"
 #include "ccl_var.h"
 
 #include <netinet/tcp.h>
@@ -84,12 +84,14 @@ public:
   auto operator=(const tcp_conn_s &a_src) -> tcp_conn_s & = delete;
   auto operator=(tcp_conn_s &&a_src) -> tcp_conn_s & = default;
 
+#ifdef CLIB_WITH_OPENSSL
   auto init_ssl() -> tcp_conn_s &
   {/*{{{*/
     m_ssl = ssl_context_s::client().conn_connect(m_epoll_fd);
 
     return *this;
   }/*}}}*/
+#endif
 
   auto fd_update(uint32_t a_evts,bool a_update_cb = false,fd_callback_t &&a_callback = nullptr) -> tcp_conn_s &
   {/*{{{*/
@@ -128,7 +130,9 @@ private:
   tcp_conn_recv_callback_t m_conn_recv_callback;
   tcp_conn_send_callback_t m_conn_send_callback;
 
+#ifdef CLIB_WITH_OPENSSL
   ssl_context_s m_ssl_ctx;
+#endif
   epoll_fd_s m_epoll_fd;
   list<tcp_conn_s> m_conn_list;
 
@@ -161,6 +165,7 @@ public:
   auto operator=(const tcp_server_s &a_src) -> tcp_server_s & = delete;
   auto operator=(tcp_server_s &&a_src) -> tcp_server_s & = default;
 
+#ifdef CLIB_WITH_OPENSSL
   auto init_ssl(const char *a_cert_file,const char *a_pkey_file) -> tcp_server_s &
   {/*{{{*/
     m_ssl_ctx = ssl_context_s::server();
@@ -170,6 +175,7 @@ public:
 
     return *this;
   }/*}}}*/
+#endif
 
   auto fd_update(uint32_t a_evts,bool a_update_cb = false,fd_callback_t &&a_callback = nullptr) -> tcp_server_s &
   {/*{{{*/

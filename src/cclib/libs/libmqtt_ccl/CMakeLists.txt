@@ -1,8 +1,6 @@
 
 set(CONF_COMPONENTS
-  "src/cclib/libs/liblinux_ccl"
-  #"src/cclib/libs/libopenssl_ccl"
-  "src/cclib/libs/libvar_ccl")
+  "src/cclib/libs/libtcp_ccl")
 set(CONF_HEADER_DIRS)
 set(CONF_DO_BUILD TRUE)
 set(CONF_INCLUDE_DIRS)

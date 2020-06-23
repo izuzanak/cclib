@@ -18,6 +18,10 @@ struct list
     INDEX m_prev_idx;
     bool m_valid;
     VALUE m_value;
+
+  public:
+    [[nodiscard]] auto is_valid() const noexcept -> bool { return m_valid; }
+    [[nodiscard]] auto object() const noexcept -> const VALUE & { return m_value; }
   };
 
 private:
@@ -312,6 +316,10 @@ public:
   [[nodiscard]] constexpr auto data() const noexcept -> const element_s * { return m_data; }
   [[nodiscard]] constexpr auto first_idx() const noexcept -> const INDEX & { return m_first_idx; }
   [[nodiscard]] constexpr auto last_idx() const noexcept -> const INDEX & { return m_last_idx; }
+  [[nodiscard]] constexpr auto is_valid(INDEX a_index) const noexcept -> bool
+  {/*{{{*/
+    return a_index < m_used && m_data[a_index].m_valid;
+  }/*}}}*/
 
   ~list()
   {/*{{{*/

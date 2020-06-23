@@ -142,7 +142,7 @@ auto tcp_conn_s::send_msg() -> tcp_conn_s &
 {/*{{{*/
   if (m_out_msg_queue.used() > 0)
   {
-    array<char> &message = *m_out_msg_queue.last();
+    array<char> &message = *m_out_msg_queue.first();
     size_t write_cnt = message.used() - m_out_msg_offset;
 
     // - limit maximal write size -

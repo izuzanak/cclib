@@ -594,6 +594,8 @@ public:
   auto append_format(const char *a_format,va_list a_ap) noexcept -> array<char> &;
   auto append_format(const char *a_format,...) noexcept -> array<char> &;
 
+  auto tail(INDEX a_count) noexcept -> array<char> &;
+
   explicit array(const char *a_format,...);
 
   template <typename PARAM>
@@ -640,6 +642,30 @@ inline auto array<char>::append_format(const char *a_format,...) noexcept -> arr
   va_start(ap,a_format);
   append_format(a_format,ap);
   va_end(ap);
+
+  return *this;
+}/*}}}*/
+
+template <>
+inline auto array<char>::tail(uint32_t a_count) noexcept -> array<char> &
+{/*{{{*/
+  debug_assert(a_count <= m_used);
+
+  if (a_count != 0)
+  {
+    uint32_t begin = m_used - a_count;
+
+    if (begin < a_count)
+    {
+      memmove(m_data,m_data + begin,a_count);
+    }
+    else
+    {
+      memcpy(m_data,m_data + begin,a_count);
+    }
+  }
+
+  m_used = a_count;
 
   return *this;
 }/*}}}*/

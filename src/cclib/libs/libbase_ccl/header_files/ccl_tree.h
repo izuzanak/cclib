@@ -551,6 +551,10 @@ public:
   [[nodiscard]] constexpr auto count() const noexcept -> const INDEX & { return m_count; }
   [[nodiscard]] constexpr auto data() const noexcept -> const node_s * { return m_data; }
   [[nodiscard]] constexpr auto root_idx() const noexcept -> const INDEX & { return m_root_idx; }
+  [[nodiscard]] constexpr auto is_valid(INDEX a_index) const noexcept -> bool
+  {/*{{{*/
+    return a_index < m_used && m_data[a_index].m_valid != 0;
+  }/*}}}*/
 
   ~tree()
   {/*{{{*/
