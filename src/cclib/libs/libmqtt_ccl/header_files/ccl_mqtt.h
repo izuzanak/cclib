@@ -127,6 +127,7 @@ private:
   epoll_fd_s m_conn_timer;
 
   bool m_ping_resp;
+  bool m_connected = false;
   bool m_disconnecting = false;
 
   list<mqtt_publish_s,uint16_t> m_published;
@@ -153,6 +154,7 @@ private:
   auto send_unsubscribe(const array<std::string> &a_filters,uint16_t a_packet_id) -> mqtt_conn_s &;
 
 public:
+  [[nodiscard]] constexpr auto connected() const noexcept -> bool { return m_connected; }
   auto conn() -> tcp_conn_s & { return m_conn; }
 
   ~mqtt_conn_s() = default;
@@ -203,14 +205,22 @@ public:
       throw_error(MQTT_INVALID_PUBLISH_REQUEST);
     }
 
+    uint16_t packet_id = 0;
+    array<char> *payload;
+
     if (a_qos > 0)
     {
-      uint16_t packet_id = m_published.append(mqtt_publish_s{a_topic,std::move(a_payload),a_qos,a_retain});
-      send_publish(a_topic,m_published[packet_id].m_payload,a_qos,a_retain,false,packet_id);
+      packet_id = m_published.append(mqtt_publish_s{a_topic,std::move(a_payload),a_qos,a_retain});
+      payload = &m_published[packet_id].m_payload;
     }
     else
     {
-      send_publish(a_topic,a_payload,a_qos,a_retain,false,0);
+      payload = &a_payload;
+    }
+
+    if (m_connected)
+    {
+      send_publish(a_topic,*payload,a_qos,a_retain,false,packet_id);
     }
 
     return *this;
@@ -244,15 +254,21 @@ public:
 
   auto disconnect() -> mqtt_conn_s &
   {/*{{{*/
-    m_buffer.used() = 0;
-    m_buffer
-      .push(0xe0)  // - DISCONNECT -
-      .push(0x00); // - remaining length -
+    if (m_connected)
+    {
+      m_buffer.used() = 0;
+      m_buffer
+        .push(0xe0)  // - DISCONNECT -
+        .push(0x00); // - remaining length -
 
-    m_conn.schedule_message(m_buffer);
+      m_conn.schedule_message(m_buffer);
+    }
 
     // - reset ping timer -
     m_conn_timer.fd().timer_set({{0,0},{0,0}},0);
+
+    // - reset connected flag -
+    m_connected = false;
 
     // - set disconnecting flag -
     m_disconnecting = true;

@@ -14,7 +14,6 @@ struct mqtt_comm_s
 private:
   static bool m_terminate;
 
-  bool m_connected = false;
   mqtt_conn_s m_conn;
   epoll_fd_s m_timer;
 

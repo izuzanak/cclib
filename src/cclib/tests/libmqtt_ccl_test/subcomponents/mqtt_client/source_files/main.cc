@@ -46,12 +46,9 @@ auto mqtt_comm_s::conn_event(uint32_t a_conn_idx,uint32_t a_event) -> void
   switch (a_event)
   {/*{{{*/
     case c_mqtt_EVENT_ERROR:
-      m_connected = false;
       break;
     case c_mqtt_EVENT_CONNECTED:
       {/*{{{*/
-        m_connected = true;
-
         m_conn.subscribe({"/test/pub","output/mod/ndb/config/gps"},1);
         m_conn.publish("/test/pub",ccl::array<char>("Hello MQTT world"),1);
 
@@ -62,11 +59,9 @@ auto mqtt_comm_s::conn_event(uint32_t a_conn_idx,uint32_t a_event) -> void
       }/*}}}*/
       break;
     case c_mqtt_EVENT_DISCONNECTED:
-      m_connected = false;
       m_terminate = true;
       break;
     case c_mqtt_EVENT_DROPPED:
-      m_connected = false;
       break;
   }/*}}}*/
 }/*}}}*/
@@ -86,7 +81,7 @@ auto mqtt_comm_s::timer_event(const epoll_event &a_epoll_event) -> void
 {/*{{{*/
   fd_s::timer_read(a_epoll_event.data.fd);
 
-  if (m_connected)
+  if (m_conn.connected())
   {
     ccl::array<char> buffer;
     buffer.append(strlen("Hello MQTT timer"),"Hello MQTT timer");

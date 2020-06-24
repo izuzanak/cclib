@@ -87,6 +87,10 @@ auto mqtt_conn_s::tcp_event(uint32_t a_conn_idx,uint32_t a_event) -> void
   {
     case c_tcp_EVENT_ERROR:
       {/*{{{*/
+
+        // - reset connected flag -
+        m_connected = false;
+
         m_conn_event_callback(a_conn_idx,c_mqtt_EVENT_ERROR);
 
         // - set connect timer -
@@ -138,6 +142,9 @@ auto mqtt_conn_s::tcp_event(uint32_t a_conn_idx,uint32_t a_event) -> void
         }
         else
         {
+          // - reset connected flag -
+          m_connected = false;
+
           m_conn_event_callback(a_conn_idx,c_mqtt_EVENT_DROPPED);
 
           // - set connect timer -
@@ -401,6 +408,9 @@ auto mqtt_conn_s::process_packet(uint8_t a_pkt_type,uint32_t a_size,const char *
         {
           process_properties(a_pkt_type,props_length,a_data);
         }
+
+        // - set connected flag -
+        m_connected = true;
 
         // - resend all unacknowledged published packets -
         if (m_published.count() > 1)
