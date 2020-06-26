@@ -6,6 +6,7 @@ namespace ccl {
 // === constants and definitions ===============================================
 
 fd_update_t *g_fd_update = nullptr;
+list<void *> pointer_s::g_list;
 
 // === methods of structure fd_s ===============================================
 

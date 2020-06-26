@@ -112,6 +112,8 @@ using mqtt_conn_recv_callback_t  = std::function<void(uint32_t a_conn_idx,
 struct mqtt_conn_s
 {/*{{{*/
 private:
+  pointer_s m_pointer;
+
   static constexpr uint32_t packet_prop_cnt = 43;
   static const std::array<mqtt_prop_s,packet_prop_cnt> packet_props;
 

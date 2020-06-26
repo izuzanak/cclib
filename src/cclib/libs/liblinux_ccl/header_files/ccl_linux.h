@@ -50,6 +50,7 @@ constexpr int EPOLL_WAIT_ERROR = 5;
 
 using fd_callback_t = std::function<void(const epoll_event &a_epoll_event)>;
 using fd_update_t = auto (int a_fd,unsigned a_evts,bool a_update_cb,fd_callback_t &&a_callback) -> void;
+
 extern fd_update_t *g_fd_update;
 
 // === definition of structure socket_address_s ================================
@@ -493,6 +494,55 @@ public:
   auto fd_update(uint32_t a_evts,bool a_update_cb = false,fd_callback_t &&a_callback = nullptr) -> epoll_fd_s &
   {/*{{{*/
     g_fd_update(m_fd,a_evts,a_update_cb,std::move(a_callback));
+
+    return *this;
+  }/*}}}*/
+};/*}}}*/
+
+// === definition of structure pointer_s =======================================
+
+struct pointer_s
+{/*{{{*/
+private:
+  static list<void *> g_list;
+  uint32_t m_index;
+
+public:
+  [[nodiscard]] constexpr auto index() const noexcept -> uint32_t { return m_index; }
+
+  template<class TYPE>
+  [[nodiscard]] static auto ptr(uint32_t a_index) noexcept -> TYPE *
+  { return reinterpret_cast<TYPE *>(g_list[a_index]); }
+
+  ~pointer_s() noexcept
+  {/*{{{*/
+    if (m_index != c_idx_not_exist)
+    {
+      g_list.remove(m_index);
+    }
+  }/*}}}*/
+
+  pointer_s() noexcept
+  {/*{{{*/
+    m_index = g_list.append(this);
+  }/*}}}*/
+
+  pointer_s(const pointer_s &a_src) = delete;
+
+  pointer_s(pointer_s &&a_src) noexcept
+  {/*{{{*/
+    m_index = a_src.m_index;
+    g_list[m_index] = this;
+
+    a_src.m_index = c_idx_not_exist;
+  }/*}}}*/
+
+  auto operator=(const pointer_s &a_src) -> pointer_s & = delete;
+
+  auto operator=(pointer_s &&a_src) noexcept -> pointer_s &
+  {/*{{{*/
+    this->~pointer_s();
+    new (this) pointer_s(std::move(a_src));
 
     return *this;
   }/*}}}*/

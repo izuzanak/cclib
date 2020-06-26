@@ -68,8 +68,9 @@ mqtt_conn_s::mqtt_conn_s(std::string a_client_id,
 
   // - set connect timer -
   m_conn_timer.fd().timer_set({{0,0},{0,1}},0);
-  m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,[this](const epoll_event &a_epoll_event) -> void {
-      timer_event(a_epoll_event,c_mqtt_TIMER_CONNECT); });
+  m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,
+      [ptr_index = m_pointer.index()](const epoll_event &a_epoll_event) -> void {
+      pointer_s::ptr<mqtt_conn_s>(ptr_index)->timer_event(a_epoll_event,c_mqtt_TIMER_CONNECT); });
 
   m_published.append({});
   m_subscribed.append({});
@@ -78,10 +79,7 @@ mqtt_conn_s::mqtt_conn_s(std::string a_client_id,
 
 auto mqtt_conn_s::tcp_event(uint32_t a_conn_idx,uint32_t a_event) -> void
 {/*{{{*/
-  (void)this;
   (void)a_conn_idx;
-
-  //fprintf(stderr,"mqtt_conn_s::tcp_event: %u - %u\n",a_conn_idx,a_event);
 
   switch (a_event)
   {
@@ -95,8 +93,9 @@ auto mqtt_conn_s::tcp_event(uint32_t a_conn_idx,uint32_t a_event) -> void
 
         // - set connect timer -
         m_conn_timer.fd().timer_set({{0,0},{c_error_retry_sec,0}},0);
-        m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,[this](const epoll_event &a_epoll_event) -> void {
-            timer_event(a_epoll_event,c_mqtt_TIMER_CONNECT); });
+        m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,
+            [ptr_index = m_pointer.index()](const epoll_event &a_epoll_event) -> void {
+            pointer_s::ptr<mqtt_conn_s>(ptr_index)->timer_event(a_epoll_event,c_mqtt_TIMER_CONNECT); });
       }/*}}}*/
       break;
     case c_tcp_EVENT_CONNECTED:
@@ -148,9 +147,10 @@ auto mqtt_conn_s::tcp_event(uint32_t a_conn_idx,uint32_t a_event) -> void
           m_conn_event_callback(a_conn_idx,c_mqtt_EVENT_DROPPED);
 
           // - set connect timer -
-          m_conn_timer.fd().timer_set({{0,0},{0,1}},0);
-          m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,[this](const epoll_event &a_epoll_event) -> void {
-              timer_event(a_epoll_event,c_mqtt_TIMER_CONNECT); });
+          m_conn_timer.fd().timer_set({{0,0},{c_error_retry_sec,0}},0);
+          m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,
+              [ptr_index = m_pointer.index()](const epoll_event &a_epoll_event) -> void {
+              pointer_s::ptr<mqtt_conn_s>(ptr_index)->timer_event(a_epoll_event,c_mqtt_TIMER_CONNECT); });
         }
       }/*}}}*/
       break;
@@ -160,8 +160,6 @@ auto mqtt_conn_s::tcp_event(uint32_t a_conn_idx,uint32_t a_event) -> void
 auto mqtt_conn_s::tcp_recv(uint32_t a_conn_idx,array<char> *a_message) -> void
 {/*{{{*/
   (void)a_conn_idx;
-
-  //fprintf(stderr,"mqtt_conn_s::tcp_recv: %u\n",a_conn_idx);
 
   do
   {
@@ -207,7 +205,6 @@ auto mqtt_conn_s::tcp_recv(uint32_t a_conn_idx,array<char> *a_message) -> void
 
 auto mqtt_conn_s::tcp_send(uint32_t a_conn_idx) -> void // NOLINT(readability-convert-member-functions-to-static)
 {/*{{{*/
-  //fprintf(stderr,"mqtt_conn_s::tcp_send: %u\n",a_conn_idx);
 }/*}}}*/
 
 auto mqtt_conn_s::timer_event(const epoll_event &a_epoll_event,uint32_t a_timer_id) -> void
@@ -219,15 +216,17 @@ auto mqtt_conn_s::timer_event(const epoll_event &a_epoll_event,uint32_t a_timer_
     case c_mqtt_TIMER_CONNECT:
       {/*{{{*/
         m_conn = tcp_conn_s(m_ip.data(),m_port,
-            [this](uint32_t a_conn_idx,uint32_t a_event) -> void { tcp_event(a_conn_idx,a_event); },
-            [this](uint32_t a_conn_idx,array<char> *a_message) -> void { tcp_recv(a_conn_idx,a_message); },
-            [this](uint32_t a_conn_idx) -> void { tcp_send(a_conn_idx); },
+            [ptr_index = m_pointer.index()](uint32_t a_conn_idx,uint32_t a_event) -> void {
+            pointer_s::ptr<mqtt_conn_s>(ptr_index)->tcp_event(a_conn_idx,a_event); },
+            [ptr_index = m_pointer.index()](uint32_t a_conn_idx,array<char> *a_message) -> void {
+            pointer_s::ptr<mqtt_conn_s>(ptr_index)->tcp_recv(a_conn_idx,a_message); },
+            [ptr_index = m_pointer.index()](uint32_t a_conn_idx) -> void {
+            pointer_s::ptr<mqtt_conn_s>(ptr_index)->tcp_send(a_conn_idx); },
             m_index);
 
         m_conn.fd_update(EPOLLIN | EPOLLOUT | EPOLLPRI,true,
-            [this](const epoll_event &a_epoll_event) -> void {
-            m_conn.fd_event(a_epoll_event);
-            });
+            [ptr_index = m_pointer.index()](const epoll_event &a_epoll_event) -> void {
+            pointer_s::ptr<mqtt_conn_s>(ptr_index)->m_conn.fd_event(a_epoll_event); });
       }/*}}}*/
       break;
     case c_mqtt_TIMER_PING:
@@ -430,8 +429,9 @@ auto mqtt_conn_s::process_packet(uint8_t a_pkt_type,uint32_t a_size,const char *
         // - schedule ping timer -
         m_ping_resp = true;
         m_conn_timer.fd().timer_set({{c_ping_period_sec,0},{c_ping_period_sec,0}},0);
-        m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,[this](const epoll_event &a_epoll_event) -> void {
-            timer_event(a_epoll_event,c_mqtt_TIMER_PING); });
+        m_conn_timer.fd_update(EPOLLIN | EPOLLPRI,true,
+            [ptr_index = m_pointer.index()](const epoll_event &a_epoll_event) -> void {
+            pointer_s::ptr<mqtt_conn_s>(ptr_index)->timer_event(a_epoll_event,c_mqtt_TIMER_PING); });
       }/*}}}*/
       break;
     case c_mqtt_cpt_PUBLISH:

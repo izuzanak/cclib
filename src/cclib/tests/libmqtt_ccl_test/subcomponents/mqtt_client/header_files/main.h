@@ -12,6 +12,7 @@ namespace ccl {
 struct mqtt_comm_s
 {/*{{{*/
 private:
+  pointer_s m_pointer;
   static bool m_terminate;
 
   mqtt_conn_s m_conn;

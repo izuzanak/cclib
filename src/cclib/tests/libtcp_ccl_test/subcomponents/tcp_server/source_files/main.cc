@@ -6,22 +6,24 @@ namespace ccl {
 // === members of structure tcp_comm_s =========================================
 
 bool tcp_comm_s::m_terminate = false;
-ccl::epoll_s *g_epoll = nullptr;
+epoll_s *g_epoll = nullptr;
 
 // === methods of structure tcp_comm_s =========================================
 
 tcp_comm_s::tcp_comm_s(std::string a_address,uint16_t a_port) :
   m_server(std::move(a_address),a_port,
-      [this](uint32_t a_conn_idx,uint32_t a_event) -> void { conn_event(a_conn_idx,a_event); },
-      [this](uint32_t a_conn_idx,array<char> *a_message) -> void { conn_recv(a_conn_idx,a_message); },
-      [this](uint32_t a_conn_idx) -> void { conn_send(a_conn_idx); })
+      [ptr_index = m_pointer.index()](uint32_t a_conn_idx,uint32_t a_event) -> void {
+      pointer_s::ptr<tcp_comm_s>(ptr_index)->conn_event(a_conn_idx,a_event); },
+      [ptr_index = m_pointer.index()](uint32_t a_conn_idx,array<char> *a_message) -> void {
+      pointer_s::ptr<tcp_comm_s>(ptr_index)->conn_recv(a_conn_idx,a_message); },
+      [ptr_index = m_pointer.index()](uint32_t a_conn_idx) -> void {
+      pointer_s::ptr<tcp_comm_s>(ptr_index)->conn_send(a_conn_idx); })
 {/*{{{*/
-  ccl::process_s::simple_signal_handler(term_signal);
+  process_s::simple_signal_handler(term_signal);
 
   m_server.fd_update(EPOLLIN | EPOLLPRI,true,
-  [this](const epoll_event &a_epoll_event) -> void 
-  {
-    m_server.fd_event(a_epoll_event);
+  [ptr_index = m_pointer.index()](const epoll_event &a_epoll_event) -> void {
+    pointer_s::ptr<tcp_comm_s>(ptr_index)->m_server.fd_event(a_epoll_event);
   });
 
   //m_server.init_ssl(

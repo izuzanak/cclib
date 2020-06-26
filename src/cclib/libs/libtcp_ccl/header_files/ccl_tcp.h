@@ -46,8 +46,8 @@ private:
   uint32_t m_ssl_action = SSL_ACTION_NONE;
 #endif
   epoll_fd_s m_epoll_fd; 
-  bool m_connecting;
-  bool m_connected;
+  bool m_connecting = false;
+  bool m_connected = false;
 
   tcp_conn_event_callback_t m_conn_event_callback;
   tcp_conn_recv_callback_t m_conn_recv_callback;
@@ -70,7 +70,7 @@ public:
       tcp_conn_recv_callback_t a_conn_recv_callback,
       tcp_conn_send_callback_t a_conn_send_callback) :
     m_epoll_fd(std::move(a_epoll_fd)),
-    m_connecting(false),m_connected(true),
+    m_connected(true),
     m_conn_event_callback(nullptr),
     m_conn_recv_callback(std::move(a_conn_recv_callback)),
     m_conn_send_callback(std::move(a_conn_send_callback)) {}
@@ -123,6 +123,8 @@ public:
 struct tcp_server_s
 {/*{{{*/
 private:
+  pointer_s m_pointer;
+
   std::string m_ip;
   uint16_t m_port = 0;
 

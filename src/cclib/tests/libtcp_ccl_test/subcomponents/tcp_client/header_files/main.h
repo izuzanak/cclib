@@ -57,6 +57,7 @@ public:
 struct tcp_comm_s
 {/*{{{*/
 private:
+  pointer_s m_pointer;
   static bool m_terminate;
 
   tcp_client_s m_client;

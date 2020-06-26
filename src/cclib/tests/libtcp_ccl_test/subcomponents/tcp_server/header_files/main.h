@@ -12,6 +12,7 @@ namespace ccl {
 struct tcp_comm_s
 {/*{{{*/
 private:
+  pointer_s m_pointer;
   static bool m_terminate;
 
   tcp_server_s m_server;

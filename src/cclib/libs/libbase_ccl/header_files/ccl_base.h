@@ -236,6 +236,11 @@ inline auto to_string(const bool &a_value,ccl::array<char> *a_trg) noexcept -> c
   return *a_trg;
 }/*}}}*/
 
+inline auto to_string(void *a_value,ccl::array<char> *a_trg) noexcept -> ccl::array<char> &
+{/*{{{*/
+  return a_trg->append_format("%p",a_value);
+}/*}}}*/
+
 template <typename TYPE>
 auto to_string(const TYPE &a_value,ccl::array<char> *a_trg) noexcept -> ccl::array<char> &
 {/*{{{*/

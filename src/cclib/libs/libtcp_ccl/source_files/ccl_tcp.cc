@@ -11,7 +11,7 @@ tcp_conn_s::tcp_conn_s(const char *a_ip,uint16_t a_port,
     tcp_conn_send_callback_t a_conn_send_callback,
     uint32_t a_index) :
   m_epoll_fd(fd_s::sock(AF_INET,SOCK_STREAM)),
-  m_connecting(true),m_connected(false),
+  m_connecting(true),
   m_conn_event_callback(std::move(a_conn_event_callback)),
   m_conn_recv_callback(std::move(a_conn_recv_callback)),
   m_conn_send_callback(std::move(a_conn_send_callback)),
@@ -357,9 +357,8 @@ auto tcp_server_s::fd_event(const epoll_event &a_epoll_event) -> void
     tcp_conn_s &conn = m_conn_list[conn_idx];
 
     conn.m_epoll_fd.fd_update(EPOLLIN | EPOLLPRI,true,
-    [this,conn_idx](const epoll_event &a_epoll_event) -> void {
-      conn_fd_event(conn_idx,a_epoll_event);
-    });
+        [ptr_index = m_pointer.index(),conn_idx](const epoll_event &a_epoll_event) -> void {
+        pointer_s::ptr<tcp_server_s>(ptr_index)->conn_fd_event(conn_idx,a_epoll_event); });
 
     conn.m_index = conn_idx;
 
