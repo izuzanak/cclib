@@ -1,6 +1,7 @@
 
 set(CONF_COMPONENTS
   "src/cclib/libs/libjson_ccl"
+  "src/cclib/libs/libsys_ccl"
   "src/cclib/libs/libtest_ccl")
 set(CONF_HEADER_DIRS)
 set(CONF_DO_BUILD TRUE)

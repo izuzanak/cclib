@@ -10,6 +10,7 @@ std::array<const char *,test_cnt> test_names =
   "json",
   "string",
   "comments",
+  "load",
 };/*}}}*/
 
 std::array<ccl::test_function_t,test_cnt> test_functions =
@@ -17,6 +18,7 @@ std::array<ccl::test_function_t,test_cnt> test_functions =
   test_json,
   test_string,
   test_comments,
+  test_load,
 };/*}}}*/
 
 // === test execution functions ================================================
@@ -95,6 +97,28 @@ R"'(
 )'";
 
   cassert(ccl::json_parser_s().parse(data.length(),data.data()) == ccl::var_s::new_dict() );
+}/*}}}*/
+
+void test_load()
+{/*{{{*/
+  //ccl::array<char> buffer;
+  //ccl::file_s("/home/jirka/folder/work/programming/git/uclang/uclang_build/macs/generated/phase.json","rb")
+  //  .read(&buffer).close();
+
+  //ccl::json_parser_s parser;
+  //ccl::var_s data = parser.parse(buffer.used(),buffer.data());
+
+  //uint32_t idx = 0;
+  //do {
+  //  data[0] = data[1];
+  //} while(++idx < 1000000);
+
+  //data[0]["_id"] = "Identifier";
+
+  //puts(buffer.debug(data[0]));
+  //puts(buffer.debug(data[1]));
+
+  //new (&data) ccl::var_s;
 }/*}}}*/
 
 // === program entry function ==================================================
