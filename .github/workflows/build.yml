@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build cclib
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/build
+          cd ${GITHUB_WORKSPACE}/build
+          cmake -DCMAKE_BUILD_TYPE="Debug" ..
+          make
+
+      - name: Test cclib
+        run: |
+          cd ${GITHUB_WORKSPACE}/build
+          mkdir -p /dev/shm/{run,log}
+          make test
+
