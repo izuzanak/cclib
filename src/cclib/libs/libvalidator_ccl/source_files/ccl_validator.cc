@@ -675,7 +675,7 @@ state_64_label:
   }\
 }/*}}}*/
 
-auto validator_s::validate_pair(const var_s &a_value,const var_s &a_props) noexcept -> int
+auto validator_s::validate_pair(const var_s &a_value,const var_s &a_props) noexcept -> int // NOLINT(misc-no-recursion)
 {/*{{{*/
   if (a_props.type() != bi_type_array)
   {

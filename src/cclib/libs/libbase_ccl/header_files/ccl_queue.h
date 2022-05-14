@@ -14,7 +14,7 @@ private:
   VALUE *m_data = nullptr;
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -23,7 +23,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -40,7 +40,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(const queue &a_src) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(const queue &a_src) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     INDEX fir_cnt;
     INDEX sec_cnt;
@@ -65,7 +65,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(const queue &a_src) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(const queue &a_src) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     INDEX sec_cnt;
     VALUE *ptr = m_data;
@@ -99,13 +99,13 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __queue_initlist_copy(const VALUE *a_data,size_t a_size) -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _queue_initlist_copy(const VALUE *a_data,size_t a_size) -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     memcpy(m_data,a_data,a_size*sizeof(VALUE));
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __queue_initlist_copy(const VALUE *a_data,size_t a_size) -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _queue_initlist_copy(const VALUE *a_data,size_t a_size) -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     INDEX sec_cnt;
     VALUE *ptr = m_data;
@@ -118,12 +118,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(VALUE *n_data,INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(VALUE *n_data,INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(VALUE *n_data,INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(VALUE *n_data,INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_constructible<VALUE>::value,"");
 
@@ -139,7 +139,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_move(VALUE *n_data,INDEX fir_cnt,INDEX sec_cnt) -> typename std::enable_if<std::is_trivially_move_constructible<TYPE>::value,void>::type
+  auto _copy_resize_move(VALUE *n_data,INDEX fir_cnt,INDEX sec_cnt) -> typename std::enable_if<std::is_trivially_move_constructible<TYPE>::value,void>::type
   {/*{{{*/
     memcpy(n_data,m_data + m_begin,fir_cnt*sizeof(VALUE));
 
@@ -150,7 +150,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_move(VALUE *n_data,INDEX fir_cnt,INDEX sec_cnt) -> typename std::enable_if<!std::is_trivially_move_constructible<TYPE>::value,void>::type
+  auto _copy_resize_move(VALUE *n_data,INDEX fir_cnt,INDEX sec_cnt) -> typename std::enable_if<!std::is_trivially_move_constructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_move_constructible<VALUE>::value,"");
 
@@ -174,12 +174,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_destructible<VALUE>::value,"");
 
@@ -219,7 +219,7 @@ private:
     }
   }/*}}}*/
 
-  auto __insert() noexcept -> INDEX
+  auto _insert() noexcept -> INDEX
   {/*{{{*/
     if (m_used >= m_size)
     {
@@ -248,7 +248,7 @@ public:
 
   ~queue()
   {/*{{{*/
-    __destruct();
+    _destruct();
   }/*}}}*/
 
   queue() = default;
@@ -261,7 +261,7 @@ public:
     }
 
     copy_resize(a_src.m_used);
-    __copy_from(a_src);
+    _copy_from(a_src);
 
     m_used = a_src.m_used;
   }/*}}}*/
@@ -288,7 +288,7 @@ public:
     }
 
     copy_resize(a_init.size());
-    __queue_initlist_copy(a_init.begin(),a_init.size());
+    _queue_initlist_copy(a_init.begin(),a_init.size());
 
     m_used = a_init.size();
   }/*}}}*/
@@ -309,7 +309,7 @@ public:
 
     if (a_src.m_used > 0)
     {
-      __copy_from(a_src);
+      _copy_from(a_src);
     }
 
     m_used = a_src.m_used;
@@ -410,7 +410,7 @@ public:
 
   auto insert(VALUE &&a_value) noexcept -> queue &
   {/*{{{*/
-    INDEX inserted_idx = __insert();
+    INDEX inserted_idx = _insert();
 
     m_data[inserted_idx] = std::move(a_value);
 
@@ -419,7 +419,7 @@ public:
 
   auto insert(const VALUE &a_value) noexcept -> queue &
   {/*{{{*/
-    INDEX inserted_idx = __insert();
+    INDEX inserted_idx = _insert();
 
     m_data[inserted_idx] = a_value;
 
@@ -479,7 +479,7 @@ public:
       memset(n_data,0,a_size*sizeof(VALUE));
 #endif
 
-      __copy_resize_init(n_data,a_size);
+      _copy_resize_init(n_data,a_size);
     }
 
     if (m_used > 0)
@@ -498,10 +498,10 @@ public:
         sec_cnt = 0;
       }
 
-      __copy_resize_move(n_data,fir_cnt,sec_cnt);
+      _copy_resize_move(n_data,fir_cnt,sec_cnt);
     }
 
-    __copy_resize_clear();
+    _copy_resize_clear();
 
     if (m_data != nullptr)
     {

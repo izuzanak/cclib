@@ -451,7 +451,7 @@ public:
   auto operator=(const epoll_s &a_src) -> epoll_s & = delete;
   auto operator=(epoll_s &&a_src) -> epoll_s & = delete;
 
-  auto __fd_update(int a_fd,uint32_t a_evts,bool a_update_cb = false,fd_callback_t &&a_callback = nullptr) -> epoll_s &;
+  auto _fd_update(int a_fd,uint32_t a_evts,bool a_update_cb = false,fd_callback_t &&a_callback = nullptr) -> epoll_s &;
   auto wait(int a_timeout) -> epoll_s &;
 };/*}}}*/
 

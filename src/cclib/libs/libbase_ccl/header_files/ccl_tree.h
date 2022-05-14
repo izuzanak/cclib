@@ -61,7 +61,7 @@ private:
   INDEX m_leaf_idx = idx_not_exist;
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -70,7 +70,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -88,13 +88,13 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(INDEX a_size,const node_s *a_data) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(INDEX a_size,const node_s *a_data) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     memcpy(m_data,a_data,a_size*sizeof(node_s));
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(INDEX a_size,const node_s *a_data) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(INDEX a_size,const node_s *a_data) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
 
     // - ignore std::bad_alloc -
@@ -110,12 +110,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear(INDEX a_size) -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear(INDEX a_size) -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear(INDEX a_size) -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear(INDEX a_size) -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_destructible<VALUE>::value,"");
 
@@ -131,12 +131,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_constructible<VALUE>::value,"");
 
@@ -151,7 +151,7 @@ private:
     }
   }/*}}}*/
 
-  [[nodiscard]] auto __get_grandparent_idx(INDEX a_idx) const noexcept -> INDEX
+  [[nodiscard]] auto _get_grandparent_idx(INDEX a_idx) const noexcept -> INDEX
   {/*{{{*/
     node_s &nd = m_data[a_idx];
 
@@ -163,9 +163,9 @@ private:
     return idx_not_exist;
   }/*}}}*/
 
-  [[nodiscard]] auto __get_uncle_idx(INDEX a_idx) const noexcept -> INDEX
+  [[nodiscard]] auto _get_uncle_idx(INDEX a_idx) const noexcept -> INDEX
   {/*{{{*/
-    INDEX gp_idx = __get_grandparent_idx(a_idx);
+    INDEX gp_idx = _get_grandparent_idx(a_idx);
 
     if (gp_idx != idx_not_exist)
     {
@@ -176,13 +176,13 @@ private:
     return idx_not_exist;
   }/*}}}*/
 
-  [[nodiscard]] auto __get_sibling_idx(INDEX a_idx) const noexcept -> INDEX
+  [[nodiscard]] auto _get_sibling_idx(INDEX a_idx) const noexcept -> INDEX
   {/*{{{*/
     node_s &p = m_data[m_data[a_idx].m_parent_idx];
     return p.m_left_idx == a_idx ? p.m_right_idx : p.m_left_idx;
   }/*}}}*/
 
-  auto __rotate_left(INDEX a_idx) noexcept -> void
+  auto _rotate_left(INDEX a_idx) noexcept -> void
   {/*{{{*/
     node_s &root = m_data[a_idx];
     node_s &pivot = m_data[root.m_right_idx];
@@ -216,7 +216,7 @@ private:
     pivot.m_left_idx = a_idx;
   }/*}}}*/
 
-  auto __rotate_right(INDEX a_idx) noexcept -> void
+  auto _rotate_right(INDEX a_idx) noexcept -> void
   {/*{{{*/
     node_s &root = m_data[a_idx];
     node_s &pivot = m_data[root.m_left_idx];
@@ -250,7 +250,7 @@ private:
     pivot.m_right_idx = a_idx;
   }/*}}}*/
 
-  auto __get_new_index() noexcept -> INDEX
+  auto _get_new_index() noexcept -> INDEX
   {/*{{{*/
     INDEX new_idx;
 
@@ -287,7 +287,7 @@ private:
     return new_idx;
   }/*}}}*/
 
-  auto __binary_tree_insert(INDEX a_new_idx,const VALUE &a_value,bool a_unique) noexcept -> INDEX
+  auto _binary_tree_insert(INDEX a_new_idx,const VALUE &a_value,bool a_unique) noexcept -> INDEX
   {/*{{{*/
     if (m_root_idx == idx_not_exist)
     {
@@ -337,7 +337,7 @@ private:
     return idx_not_exist;
   }/*}}}*/
 
-  auto __replace_delete_node_by_child(INDEX a_idx,INDEX a_ch_idx) noexcept -> void
+  auto _replace_delete_node_by_child(INDEX a_idx,INDEX a_ch_idx) noexcept -> void
   {/*{{{*/
     node_s &nd = m_data[a_idx];
 
@@ -363,7 +363,7 @@ private:
     }
   }/*}}}*/
 
-  auto __remove_black_black(INDEX a_idx) noexcept -> void
+  auto _remove_black_black(INDEX a_idx) noexcept -> void
   {/*{{{*/
     INDEX node_idx = a_idx;
     do {
@@ -388,11 +388,11 @@ private:
 
           if (node_idx == parent.m_left_idx)
           {
-            __rotate_left(parent_idx);
+            _rotate_left(parent_idx);
           }
           else
           {
-            __rotate_right(parent_idx);
+            _rotate_right(parent_idx);
           }
         }
       }
@@ -421,13 +421,13 @@ private:
           {
             sibling.m_color = 0;
             m_data[sibling.m_left_idx].m_color = 1;
-            __rotate_right(sibling_idx);
+            _rotate_right(sibling_idx);
           }
           else if (node_idx == parent.m_right_idx && m_data[sibling.m_left_idx].m_color && !m_data[sibling.m_right_idx].m_color)
           {
             sibling.m_color = 0;
             m_data[sibling.m_right_idx].m_color = 1;
-            __rotate_left(sibling_idx);
+            _rotate_left(sibling_idx);
           }
         }
 
@@ -441,12 +441,12 @@ private:
           if (node_idx == parent.m_left_idx)
           {
             m_data[sibling.m_right_idx].m_color = 1;
-            __rotate_left(parent_idx);
+            _rotate_left(parent_idx);
           }
           else
           {
             m_data[sibling.m_left_idx].m_color = 1;
-            __rotate_right(parent_idx);
+            _rotate_right(parent_idx);
           }
         }
 
@@ -456,10 +456,10 @@ private:
     } while(true);
   }/*}}}*/
 
-  auto __remove_one_child(INDEX a_idx,INDEX a_ch_idx) noexcept -> void
+  auto _remove_one_child(INDEX a_idx,INDEX a_ch_idx) noexcept -> void
   {/*{{{*/
     node_s &nd = m_data[a_idx];
-    __replace_delete_node_by_child(a_idx,a_ch_idx);
+    _replace_delete_node_by_child(a_idx,a_ch_idx);
 
     nd.m_parent_idx = m_free_idx;
     m_free_idx = a_idx;
@@ -477,12 +477,12 @@ private:
       }
       else
       {
-        __remove_black_black(a_ch_idx);
+        _remove_black_black(a_ch_idx);
       }
     }
   }/*}}}*/
 
-  auto __insert_operation(INDEX a_idx) noexcept -> void
+  auto _insert_operation(INDEX a_idx) noexcept -> void
   {/*{{{*/
     INDEX node_idx = a_idx;
     do {
@@ -499,33 +499,33 @@ private:
         return;
       }
 
-      INDEX uncle_idx = __get_uncle_idx(node_idx);
+      INDEX uncle_idx = _get_uncle_idx(node_idx);
       if (uncle_idx != idx_not_exist && !m_data[uncle_idx].m_color)
       {
         m_data[nd.m_parent_idx].m_color = 1;
         m_data[uncle_idx].m_color = 1;
 
-        node_idx = __get_grandparent_idx(node_idx);
+        node_idx = _get_grandparent_idx(node_idx);
         m_data[node_idx].m_color = 0;
 
         continue;
       }
 
-      INDEX grandparent_idx = __get_grandparent_idx(node_idx);
+      INDEX grandparent_idx = _get_grandparent_idx(node_idx);
 
       if (node_idx == m_data[nd.m_parent_idx].m_right_idx && nd.m_parent_idx == m_data[grandparent_idx].m_left_idx)
       {
-        __rotate_left(nd.m_parent_idx);
+        _rotate_left(nd.m_parent_idx);
         node_idx = nd.m_left_idx;
       }
       else if (node_idx == m_data[nd.m_parent_idx].m_left_idx && nd.m_parent_idx == m_data[grandparent_idx].m_right_idx)
       {
-        __rotate_right(nd.m_parent_idx);
+        _rotate_right(nd.m_parent_idx);
         node_idx = nd.m_right_idx;
       }
 
       {
-        INDEX grandparent_idx = __get_grandparent_idx(node_idx);
+        INDEX grandparent_idx = _get_grandparent_idx(node_idx);
         node_s &nd = m_data[node_idx];
 
         m_data[nd.m_parent_idx].m_color = 1;
@@ -533,11 +533,11 @@ private:
 
         if (node_idx == m_data[nd.m_parent_idx].m_left_idx && nd.m_parent_idx == m_data[grandparent_idx].m_left_idx)
         {
-          __rotate_right(grandparent_idx);
+          _rotate_right(grandparent_idx);
         }
         else
         {
-          __rotate_left(grandparent_idx);
+          _rotate_left(grandparent_idx);
         }
 
         return;
@@ -558,7 +558,7 @@ public:
 
   ~tree()
   {/*{{{*/
-    __destruct();
+    _destruct();
   }/*}}}*/
 
   tree() = default;
@@ -571,7 +571,7 @@ public:
     }
 
     copy_resize(a_src.m_used);
-    __copy_from(a_src.m_used,a_src.m_data);
+    _copy_from(a_src.m_used,a_src.m_data);
 
     m_used = a_src.m_used;
     m_count = a_src.m_count;
@@ -629,7 +629,7 @@ public:
 
     if (a_src.m_used > 0)
     {
-      __copy_from(a_src.m_used,a_src.m_data);
+      _copy_from(a_src.m_used,a_src.m_data);
     }
 
     m_used = a_src.m_used;
@@ -892,9 +892,9 @@ public:
 
   auto insert(VALUE &&a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_node_idx = __get_new_index();
-    __binary_tree_insert(new_node_idx,a_value,false);
-    __insert_operation(new_node_idx);
+    INDEX new_node_idx = _get_new_index();
+    _binary_tree_insert(new_node_idx,a_value,false);
+    _insert_operation(new_node_idx);
 
     m_data[new_node_idx].m_value = std::move(a_value);
 
@@ -903,9 +903,9 @@ public:
 
   auto insert(const VALUE &a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_node_idx = __get_new_index();
-    __binary_tree_insert(new_node_idx,a_value,false);
-    __insert_operation(new_node_idx);
+    INDEX new_node_idx = _get_new_index();
+    _binary_tree_insert(new_node_idx,a_value,false);
+    _insert_operation(new_node_idx);
 
     m_data[new_node_idx].m_value = a_value;
 
@@ -914,8 +914,8 @@ public:
 
   auto unique_insert(VALUE &&a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_node_idx = __get_new_index();
-    INDEX old_node_idx = __binary_tree_insert(new_node_idx,a_value,true);
+    INDEX new_node_idx = _get_new_index();
+    INDEX old_node_idx = _binary_tree_insert(new_node_idx,a_value,true);
 
     if (old_node_idx != idx_not_exist)
     {
@@ -930,7 +930,7 @@ public:
       return old_node_idx;
     }
 
-    __insert_operation(new_node_idx);
+    _insert_operation(new_node_idx);
 
     m_data[new_node_idx].m_value = std::move(a_value);
 
@@ -939,8 +939,8 @@ public:
 
   auto unique_insert(const VALUE &a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_node_idx = __get_new_index();
-    INDEX old_node_idx = __binary_tree_insert(new_node_idx,a_value,true);
+    INDEX new_node_idx = _get_new_index();
+    INDEX old_node_idx = _binary_tree_insert(new_node_idx,a_value,true);
 
     if (old_node_idx != idx_not_exist)
     {
@@ -955,7 +955,7 @@ public:
       return old_node_idx;
     }
 
-    __insert_operation(new_node_idx);
+    _insert_operation(new_node_idx);
 
     m_data[new_node_idx].m_value = a_value;
 
@@ -1064,16 +1064,16 @@ public:
           del_nd.m_color = tmp_char;
         }
 
-        __remove_one_child(a_idx,del_nd.m_right_idx);
+        _remove_one_child(a_idx,del_nd.m_right_idx);
       }
       else
       {
-        __remove_one_child(a_idx,del_nd.m_left_idx);
+        _remove_one_child(a_idx,del_nd.m_left_idx);
       }
     }
     else
     {
-      __remove_one_child(a_idx,del_nd.m_right_idx);
+      _remove_one_child(a_idx,del_nd.m_right_idx);
     }
 
     return *this;
@@ -1084,7 +1084,7 @@ public:
   {/*{{{*/
     debug_assert(a_size >= m_used);
 
-    __copy_resize_clear(a_size);
+    _copy_resize_clear(a_size);
 
     if (a_size <= 0)
     {
@@ -1099,7 +1099,7 @@ public:
       m_data = static_cast<node_s *>(crealloc(m_data,a_size*sizeof(node_s)));
     }
 
-    __copy_resize_init(a_size);
+    _copy_resize_init(a_size);
 
     m_size = a_size;
 

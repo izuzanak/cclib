@@ -34,7 +34,7 @@ private:
   INDEX m_last_idx = idx_not_exist;
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -43,7 +43,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -60,13 +60,13 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(INDEX a_size,const element_s *a_data) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(INDEX a_size,const element_s *a_data) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     memcpy(m_data,a_data,a_size*sizeof(element_s));
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(INDEX a_size,const element_s *a_data) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(INDEX a_size,const element_s *a_data) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
 
     // - ignore std::bad_alloc -
@@ -82,12 +82,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear(INDEX a_size) -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear(INDEX a_size) -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear(INDEX a_size) -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear(INDEX a_size) -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_destructible<VALUE>::value,"");
 
@@ -103,12 +103,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_constructible<VALUE>::value,"");
 
@@ -123,7 +123,7 @@ private:
     }
   }/*}}}*/
 
-  auto __prepend() noexcept -> INDEX
+  auto _prepend() noexcept -> INDEX
   {/*{{{*/
     INDEX new_idx;
 
@@ -168,7 +168,7 @@ private:
     return new_idx;
   }/*}}}*/
 
-  auto __append() noexcept -> INDEX
+  auto _append() noexcept -> INDEX
   {/*{{{*/
     INDEX new_idx;
 
@@ -213,7 +213,7 @@ private:
     return new_idx;
   }/*}}}*/
 
-  auto __insert_before(INDEX a_idx) noexcept -> INDEX
+  auto _insert_before(INDEX a_idx) noexcept -> INDEX
   {/*{{{*/
     debug_assert(a_idx < m_used && m_data[a_idx].m_valid);
 
@@ -261,7 +261,7 @@ private:
     return new_idx;
   }/*}}}*/
 
-  auto __insert_after(INDEX a_idx) noexcept -> INDEX
+  auto _insert_after(INDEX a_idx) noexcept -> INDEX
   {/*{{{*/
     debug_assert(a_idx < m_used && m_data[a_idx].m_valid);
 
@@ -323,7 +323,7 @@ public:
 
   ~list()
   {/*{{{*/
-    __destruct();
+    _destruct();
   }/*}}}*/
 
   list() = default;
@@ -336,7 +336,7 @@ public:
     }
 
     copy_resize(a_src.m_used);
-    __copy_from(a_src.m_used,a_src.m_data);
+    _copy_from(a_src.m_used,a_src.m_data);
 
     m_used = a_src.m_used;
     m_count = a_src.m_count;
@@ -394,7 +394,7 @@ public:
 
     if (a_src.m_used > 0)
     {
-      __copy_from(a_src.m_used,a_src.m_data);
+      _copy_from(a_src.m_used,a_src.m_data);
     }
 
     m_used = a_src.m_used;
@@ -513,7 +513,7 @@ public:
 
   auto prepend(VALUE &&a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __prepend();
+    INDEX new_idx = _prepend();
 
     m_data[new_idx].m_value = std::move(a_value);
 
@@ -522,7 +522,7 @@ public:
 
   auto prepend(const VALUE &a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __prepend();
+    INDEX new_idx = _prepend();
 
     m_data[new_idx].m_value = a_value;
 
@@ -531,7 +531,7 @@ public:
 
   auto append(VALUE &&a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __append();
+    INDEX new_idx = _append();
 
     m_data[new_idx].m_value = std::move(a_value);
 
@@ -540,7 +540,7 @@ public:
 
   auto append(const VALUE &a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __append();
+    INDEX new_idx = _append();
 
     m_data[new_idx].m_value = a_value;
 
@@ -549,7 +549,7 @@ public:
 
   auto insert_before(INDEX a_idx,VALUE &&a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __insert_before(a_idx);
+    INDEX new_idx = _insert_before(a_idx);
 
     m_data[new_idx].m_value = std::move(a_value);
 
@@ -558,7 +558,7 @@ public:
 
   auto insert_before(INDEX a_idx,const VALUE &a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __insert_before(a_idx);
+    INDEX new_idx = _insert_before(a_idx);
 
     m_data[new_idx].m_value = a_value;
 
@@ -567,7 +567,7 @@ public:
 
   auto insert_after(INDEX a_idx,VALUE &&a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __insert_after(a_idx);
+    INDEX new_idx = _insert_after(a_idx);
 
     m_data[new_idx].m_value = std::move(a_value);
 
@@ -576,7 +576,7 @@ public:
 
   auto insert_after(INDEX a_idx,const VALUE &a_value) noexcept -> INDEX
   {/*{{{*/
-    INDEX new_idx = __insert_after(a_idx);
+    INDEX new_idx = _insert_after(a_idx);
 
     m_data[new_idx].m_value = a_value;
 
@@ -634,7 +634,7 @@ public:
   {/*{{{*/
     debug_assert(a_size >= m_used);
 
-    __copy_resize_clear(a_size);
+    _copy_resize_clear(a_size);
 
     if (a_size <= 0)
     {
@@ -650,7 +650,7 @@ public:
       m_data = static_cast<element_s *>(crealloc(m_data,a_size*sizeof(element_s)));
     }
 
-    __copy_resize_init(a_size);
+    _copy_resize_init(a_size);
 
     m_size = a_size;
 

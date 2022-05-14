@@ -75,23 +75,23 @@ private:
 
   array<lalr_stack_element_s> m_lalr_stack;
 
-  static auto pa_null(json_parser_s *_this) noexcept -> void;
-  static auto pa_object_begin(json_parser_s *_this) noexcept -> void;
-  static auto pa_object_pair(json_parser_s *_this) noexcept -> void;
-  static auto pa_array_begin(json_parser_s *_this) noexcept -> void;
-  static auto pa_array_value(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_string(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_integer(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_float(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_object(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_array(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_true(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_false(json_parser_s *_this) noexcept -> void;
-  static auto pa_val_null(json_parser_s *_this) noexcept -> void;
-  static auto pa_string(json_parser_s *_this) noexcept -> void;
+  static auto pa_null(json_parser_s *parser) noexcept -> void;
+  static auto pa_object_begin(json_parser_s *parser) noexcept -> void;
+  static auto pa_object_pair(json_parser_s *parser) noexcept -> void;
+  static auto pa_array_begin(json_parser_s *parser) noexcept -> void;
+  static auto pa_array_value(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_string(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_integer(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_float(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_object(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_array(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_true(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_false(json_parser_s *parser) noexcept -> void;
+  static auto pa_val_null(json_parser_s *parser) noexcept -> void;
+  static auto pa_string(json_parser_s *parser) noexcept -> void;
 
   constexpr static uint32_t c_parse_action_cnt = 24;
-  static std::array<void (*)(json_parser_s *_this),c_parse_action_cnt> pa_callers;
+  static std::array<void (*)(json_parser_s *parser),c_parse_action_cnt> pa_callers;
 
   static auto process_json_string(const char *a_ptr,const char *a_ptr_end,array<char> *a_trg) -> void;
 

@@ -261,7 +261,7 @@ ccl::epoll_s *g_epoll = nullptr;
 
 auto epoll_fd_update(int a_fd,unsigned a_evts,bool a_update_cb,ccl::fd_callback_t &&a_callback) -> void
 {/*{{{*/
-  g_epoll->__fd_update(a_fd,a_evts,a_update_cb,std::move(a_callback));
+  g_epoll->_fd_update(a_fd,a_evts,a_update_cb,std::move(a_callback));
 }/*}}}*/
 
 void test_epoll()

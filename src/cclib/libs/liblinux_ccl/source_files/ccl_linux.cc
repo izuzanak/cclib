@@ -167,7 +167,7 @@ pid_s::pid_s(array<const char *> &&a_arguments)
 
 // === methods of structure epoll_s ============================================
 
-auto epoll_s::__fd_update(int a_fd,uint32_t a_evts,bool a_update_cb,fd_callback_t &&a_callback) -> epoll_s &
+auto epoll_s::_fd_update(int a_fd,uint32_t a_evts,bool a_update_cb,fd_callback_t &&a_callback) -> epoll_s &
 {/*{{{*/
   debug_assert(a_fd >= 0);
 

@@ -15,7 +15,7 @@ private:
   VALUE *m_data = nullptr;
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -24,7 +24,7 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _destruct() -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     if (m_data != nullptr)
     {
@@ -41,13 +41,13 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(INDEX a_size,const VALUE *a_data) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(INDEX a_size,const VALUE *a_data) noexcept -> typename std::enable_if<std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
     memcpy(m_data,a_data,a_size*sizeof(VALUE));
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_from(INDEX a_size,const VALUE *a_data) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
+  auto _copy_from(INDEX a_size,const VALUE *a_data) noexcept -> typename std::enable_if<!std::is_trivially_copy_assignable<TYPE>::value,void>::type
   {/*{{{*/
 
     // - ignore std::bad_alloc -
@@ -63,12 +63,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear(INDEX a_size) -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear(INDEX a_size) -> typename std::enable_if<std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_clear(INDEX a_size) -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
+  auto _copy_resize_clear(INDEX a_size) -> typename std::enable_if<!std::is_trivially_destructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_destructible<VALUE>::value,"");
 
@@ -84,12 +84,12 @@ private:
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(INDEX a_size) -> typename std::enable_if<std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
   }/*}}}*/
 
   template<class TYPE = VALUE>
-  auto __copy_resize_init(INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
+  auto _copy_resize_init(INDEX a_size) -> typename std::enable_if<!std::is_trivially_constructible<TYPE>::value,void>::type
   {/*{{{*/
     static_assert(std::is_nothrow_constructible<VALUE>::value,"");
 
@@ -116,7 +116,7 @@ public:
 
   ~array()
   {/*{{{*/
-    __destruct();
+    _destruct();
   }/*}}}*/
 
   array() = default;
@@ -129,7 +129,7 @@ public:
     }
 
     copy_resize(a_src.m_used);
-    __copy_from(a_src.m_used,a_src.m_data);
+    _copy_from(a_src.m_used,a_src.m_data);
 
     m_used = a_src.m_used;
   }/*}}}*/
@@ -157,7 +157,7 @@ public:
     copy_resize(a_init.size());
 
     debug_assert(m_data != nullptr);
-    __copy_from(a_init.size(),a_init.begin());
+    _copy_from(a_init.size(),a_init.begin());
 
     m_used = a_init.size();
   }/*}}}*/
@@ -178,7 +178,7 @@ public:
 
     if (a_src.m_used > 0)
     {
-      __copy_from(a_src.m_used,a_src.m_data);
+      _copy_from(a_src.m_used,a_src.m_data);
     }
 
     m_used = a_src.m_used;
@@ -222,7 +222,7 @@ public:
 
     if (a_size > 0)
     {
-      __copy_from(a_size,a_data);
+      _copy_from(a_size,a_data);
     }
 
     m_used = a_size;
@@ -380,7 +380,7 @@ public:
   {/*{{{*/
     debug_assert(a_size >= m_used);
 
-    __copy_resize_clear(a_size);
+    _copy_resize_clear(a_size);
 
     if (a_size <= 0)
     {
@@ -396,7 +396,7 @@ public:
       m_data = static_cast<VALUE *>(crealloc(m_data,a_size*sizeof(VALUE)));
     }
 
-    __copy_resize_init(a_size);
+    _copy_resize_init(a_size);
 
     m_size = a_size;
 

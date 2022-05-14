@@ -45,7 +45,7 @@ constexpr std::array<uint32_t,json_lalr_state_cnt*c_json_terminal_plus_nontermin
        json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,  JSON_REDUCE(13),  JSON_REDUCE(13),       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,       json_blank,
 };/*}}}*/
 
-std::array<void (*)(json_parser_s *_this),json_parser_s::c_parse_action_cnt> json_parser_s::pa_callers =
+std::array<void (*)(json_parser_s *parser),json_parser_s::c_parse_action_cnt> json_parser_s::pa_callers =
 {/*{{{*/
   json_parser_s::pa_null,
   json_parser_s::pa_null,
@@ -75,150 +75,150 @@ std::array<void (*)(json_parser_s *_this),json_parser_s::c_parse_action_cnt> jso
 
 // === methods of structure json_parser_s ======================================
 
-auto json_parser_s::pa_null(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_null(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  (void)_this;
+  (void)parser;
 
   debug_assert(false);
 }/*}}}*/
 
-auto json_parser_s::pa_object_begin(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_object_begin(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_objects.push(var_s::new_dict());
+  parser->m_objects.push(var_s::new_dict());
 }/*}}}*/
 
-auto json_parser_s::pa_object_pair(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_object_pair(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_objects.last()[_this->m_string_vars[_this->m_string_idxs.pop()]] = std::move(_this->m_values.pop());
+  parser->m_objects.last()[parser->m_string_vars[parser->m_string_idxs.pop()]] = std::move(parser->m_values.pop());
 }/*}}}*/
 
-auto json_parser_s::pa_array_begin(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_array_begin(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_arrays.push(var_s::new_array());
+  parser->m_arrays.push(var_s::new_array());
 }/*}}}*/
 
-auto json_parser_s::pa_array_value(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_array_value(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_arrays.last().push(std::move(_this->m_values.pop()));
+  parser->m_arrays.last().push(std::move(parser->m_values.pop()));
 }/*}}}*/
 
-auto json_parser_s::pa_val_string(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_string(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_values.push(_this->m_string_vars[_this->m_string_idxs.pop()]);
+  parser->m_values.push(parser->m_string_vars[parser->m_string_idxs.pop()]);
 }/*}}}*/
 
-auto json_parser_s::pa_val_integer(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_integer(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  lalr_stack_element_s &lse = _this->m_lalr_stack.last();
+  lalr_stack_element_s &lse = parser->m_lalr_stack.last();
 
   // - retrieve number from source -
-  int64_t const_int = strtoll(_this->m_data + lse.terminal_start(),nullptr,10);
+  int64_t const_int = strtoll(parser->m_data + lse.terminal_start(),nullptr,10);
 
   // - get constant position in array -
-  uint32_t cd_idx = _this->m_const_integers.unique_insert(const_int);
+  uint32_t cd_idx = parser->m_const_integers.unique_insert(const_int);
 
-  if (cd_idx >= _this->m_integer_vars.used())
+  if (cd_idx >= parser->m_integer_vars.used())
   {
     // - skip tree zero index -
-    if (_this->m_integer_vars.used() == 0)
+    if (parser->m_integer_vars.used() == 0)
     {
-      _this->m_integer_vars.push_blank();
+      parser->m_integer_vars.push_blank();
     }
 
     // - create new integer variable -
-    _this->m_integer_vars.push(var_s(const_int));
+    parser->m_integer_vars.push(var_s(const_int));
   }
 
-  _this->m_values.push(_this->m_integer_vars[cd_idx]);
+  parser->m_values.push(parser->m_integer_vars[cd_idx]);
 }/*}}}*/
 
-auto json_parser_s::pa_val_float(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_float(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  lalr_stack_element_s &lse = _this->m_lalr_stack.last();
+  lalr_stack_element_s &lse = parser->m_lalr_stack.last();
 
   // - retrieve number from source -
-  double const_float = strtod(_this->m_data + lse.terminal_start(),nullptr);
+  double const_float = strtod(parser->m_data + lse.terminal_start(),nullptr);
 
   // - get constant position in array -
-  uint32_t cd_idx = _this->m_const_floats.unique_insert(const_float);
+  uint32_t cd_idx = parser->m_const_floats.unique_insert(const_float);
 
-  if (cd_idx >= _this->m_float_vars.used())
+  if (cd_idx >= parser->m_float_vars.used())
   {
     // - skip tree zero index -
-    if (_this->m_float_vars.used() == 0)
+    if (parser->m_float_vars.used() == 0)
     {
-      _this->m_float_vars.push_blank();
+      parser->m_float_vars.push_blank();
     }
 
     // - create new float variable -
-    _this->m_float_vars.push(var_s(const_float));
+    parser->m_float_vars.push(var_s(const_float));
   }
 
   // - insert float variable to m_values -
-  _this->m_values.push(_this->m_float_vars[cd_idx]);
+  parser->m_values.push(parser->m_float_vars[cd_idx]);
 }/*}}}*/
 
-auto json_parser_s::pa_val_object(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_object(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_values.push(std::move(_this->m_objects.pop()));
+  parser->m_values.push(std::move(parser->m_objects.pop()));
 }/*}}}*/
 
-auto json_parser_s::pa_val_array(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_array(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_values.push(std::move(_this->m_arrays.pop()));
+  parser->m_values.push(std::move(parser->m_arrays.pop()));
 }/*}}}*/
 
-auto json_parser_s::pa_val_true(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_true(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  if (_this->m_true_var.type() == bi_type_blank)
+  if (parser->m_true_var.type() == bi_type_blank)
   {
-    _this->m_true_var = var_s(true);
+    parser->m_true_var = var_s(true);
   }
 
-  _this->m_values.push(_this->m_true_var);
+  parser->m_values.push(parser->m_true_var);
 }/*}}}*/
 
-auto json_parser_s::pa_val_false(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_false(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  if (_this->m_false_var.type() == bi_type_blank)
+  if (parser->m_false_var.type() == bi_type_blank)
   {
-    _this->m_false_var = var_s(false);
+    parser->m_false_var = var_s(false);
   }
 
-  _this->m_values.push(_this->m_false_var);
+  parser->m_values.push(parser->m_false_var);
 }/*}}}*/
 
-auto json_parser_s::pa_val_null(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_val_null(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  _this->m_values.push(_this->m_null_var);
+  parser->m_values.push(parser->m_null_var);
 }/*}}}*/
 
-auto json_parser_s::pa_string(json_parser_s *_this) noexcept -> void
+auto json_parser_s::pa_string(json_parser_s *parser) noexcept -> void
 {/*{{{*/
-  lalr_stack_element_s &lse = _this->m_lalr_stack.last();
+  lalr_stack_element_s &lse = parser->m_lalr_stack.last();
 
-  const char *ptr = _this->m_data + lse.terminal_start() + 1;
-  const char *ptr_end = _this->m_data + lse.terminal_end() - 1;
+  const char *ptr = parser->m_data + lse.terminal_start() + 1;
+  const char *ptr_end = parser->m_data + lse.terminal_end() - 1;
 
-  process_json_string(ptr,ptr_end,&_this->m_buffer);
+  process_json_string(ptr,ptr_end,&parser->m_buffer);
 
   // - get constant position in array -
-  uint32_t cs_idx = _this->m_const_buffers.unique_insert(_this->m_buffer);
+  uint32_t cs_idx = parser->m_const_buffers.unique_insert(parser->m_buffer);
 
-  if (cs_idx >= _this->m_string_vars.used())
+  if (cs_idx >= parser->m_string_vars.used())
   {
     // - skip tree zero index -
-    if (_this->m_string_vars.used() == 0)
+    if (parser->m_string_vars.used() == 0)
     {
-      _this->m_string_vars.push_blank();
+      parser->m_string_vars.push_blank();
     }
 
-    array<char> &buffer = _this->m_const_buffers[cs_idx];
-    _this->m_string_vars.push(var_s(std::string(buffer.data(),buffer.used())));
+    array<char> &buffer = parser->m_const_buffers[cs_idx];
+    parser->m_string_vars.push(var_s(std::string(buffer.data(),buffer.used())));
   }
 
   // - store string index -
-  _this->m_string_idxs.push(cs_idx);
+  parser->m_string_idxs.push(cs_idx);
 }/*}}}*/
 
 auto json_parser_s::process_json_string(const char *a_ptr,const char *a_ptr_end,array<char> *a_trg) -> void
